@@ -20,6 +20,6 @@ An experimtenal Pokémon GO map using Discord components.
 
 # Setup
 - `cp config-example.py config.py` and fill out
-- create a venv (important!) and `path/to/venv/pip install git+https://github.com/Rapptz/discord.py.git`
+- create a venv (important!) and `path/to/venv/pip install git+https://github.com/Rapptz/discord.py.git aiomysql`
 - Upload the emojis in the `emojis/` folder to your configured emoji server
 - start the bot using `start_map.py`. You can get the map by saying `!map` wherever
