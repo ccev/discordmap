@@ -2,7 +2,7 @@
 
 An experimtenal Pokémon GO map using Discord components.
 
-![](https://cdn.discordapp.com/attachments/523253670700122144/880927960608157726/vHkLFO0kUy.mp4)
+[video demo](https://cdn.discordapp.com/attachments/523253670700122144/880927960608157726/vHkLFO0kUy.mp4)
 
 ## Features
 - Display Pokemon, Raids, Gyms, Pokestops and Grunts
