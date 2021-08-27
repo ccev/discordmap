@@ -118,11 +118,13 @@ class CategorySelect(discord.ui.Select):
         self.dmap = dmap
 
     async def callback(self, interaction: discord.Interaction):
-        self.dmap.set_time()
         await interaction.response.defer()
+        if not self.dmap.is_author(interaction.user.id):
+            return
+        self.dmap.set_time()
 
         values = list(map(int, self.values))
         for i, option in enumerate(self.options):
             option.default = bool(i in values)
 
-        await self.dmap.update(interaction.message)
+        await self.dmap.update()

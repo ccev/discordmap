@@ -6,7 +6,7 @@ import math
 from time import time
 
 from map.buttons import (EmptyButton, MultiplierButton, UpButton, LeftButton, DownButton,
-                         RightButton, ZoomInButton, ZoomOutButton)
+                         RightButton, ZoomInButton, ZoomOutButton, SettingsButton)
 from map.categories import CategorySelect
 from map.map_objects import MapObject
 from map.config import Area
@@ -18,10 +18,12 @@ class Map(discord.ui.View):
     zoom: float
     lat: float
     lon: float
+    style: str = STYLES[0][1]
     multiplier: float
     marker_multiplier: float
-    message: Optional[discord.Message] = None
+    author_id: int
     url: str = TILESERVER + "staticmap"
+    message: discord.Message
     embed: discord.Embed
     start: float
 
@@ -31,13 +33,14 @@ class Map(discord.ui.View):
     category: CategorySelect
     map_objects: List[MapObject]
 
-    def __init__(self):
+    def __init__(self, author_id: int):
         super().__init__(timeout=None)
         self.set_time()
         init_area = AREAS[0]
         self.zoom = init_area.zoom
         self.lat = init_area.lat
         self.lon = init_area.lon
+        self.author_id = author_id
 
         self.multiplier = 1
         self.marker_multiplier = 1
@@ -49,13 +52,13 @@ class Map(discord.ui.View):
             self.category,
             AreaSelect(self),
             EmptyButton(0), UpButton(self), EmptyButton(1), ZoomInButton(self), MultiplierButton(self),
-            LeftButton(self), DownButton(self), RightButton(self), ZoomOutButton(self)
+            LeftButton(self), DownButton(self), RightButton(self), ZoomOutButton(self), SettingsButton(self)
         ]:
             self.add_item(item)
 
     def get_data(self):
         data = {
-            "style": STYLES[0],
+            "style": self.style,
             "latitude": self.lat,
             "longitude": self.lon,
             "zoom": self.zoom,
@@ -75,6 +78,9 @@ class Map(discord.ui.View):
 
     def set_time(self):
         self.start = time()
+
+    def is_author(self, check_id: int):
+        return check_id == self.author_id
 
     def point_to_lat(self, wanted_points):
         # copied from https://help.openstreetmap.org/questions/75611/transform-xy-pixel-values-into-lat-and-long
@@ -140,10 +146,14 @@ class Map(discord.ui.View):
                 self.embed.set_image(url=self.url + "/pregenerated/" + pregen_id)
                 self.embed.set_footer(text=f"This took {round(time() - self.start, 3)}s")
 
-    async def edit(self, message):
-        await message.edit(embed=self.embed, view=self)
+    async def edit(self):
+        await self.message.edit(embed=self.embed, view=self)
 
-    async def update(self, message):
+    async def send(self, ctx):
+        await self.set_map()
+        self.message = await ctx.send(embed=self.embed, view=self)
+
+    async def update(self):
         self.map_objects = []
         for selected_index in self.category.values:
             category = self.category.categories[int(selected_index)]
@@ -156,4 +166,4 @@ class Map(discord.ui.View):
         self.map_objects = sorted(self.map_objects, key=lambda o: o.lat, reverse=True)
 
         await self.set_map()
-        await self.edit(message)
+        await self.edit()

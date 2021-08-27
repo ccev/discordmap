@@ -13,7 +13,7 @@ MAP_WIDTH = 700
 MAP_HEIGHT = 400
 MAP_SCALE = 1
 TILESERVER = "https://tiles.url.com/"
-STYLES = ["osm-bright"]  # only first entry is used
+STYLES = [("OSM Bright", "osm-bright")]  # name, tileserver ID
 
 ADMINS = [211562278800195584]  # unused rn
 EMOJI_SERVER = 12345678912345678

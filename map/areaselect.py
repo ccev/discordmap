@@ -19,7 +19,10 @@ class AreaSelect(discord.ui.Select):
             ))
 
     async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        if not self.dmap.is_author(interaction.user.id):
+            return
         self.dmap.set_time()
         value = int(self.values[0])
         self.dmap.jump_to_area(AREAS[value])
-        await self.dmap.update(interaction.message)
+        await self.dmap.update()

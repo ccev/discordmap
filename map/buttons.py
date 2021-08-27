@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import discord
 from config import EMOJIS
+from map.settings import Settings
 
 if TYPE_CHECKING:
     from map.map import Map
@@ -20,9 +21,11 @@ class BaseMapControlButton(discord.ui.Button):
         self.dmap = dmap
 
     async def _callback(self, interaction: discord.Interaction):
-        self.dmap.set_time()
         await interaction.response.defer()
-        await self.dmap.update(interaction.message)
+        if not self.dmap.is_author(interaction.user.id):
+            return
+        self.dmap.set_time()
+        await self.dmap.update()
 
 
 class EmptyButton(discord.ui.Button):
@@ -40,11 +43,23 @@ class MultiplierButton(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
+        if not self.dmap.is_author(interaction.user.id):
+            return
         multiplier = self.multipliers.pop()
         self.multipliers.insert(0, multiplier)
         self.dmap.multiplier = multiplier
         self.label = str(multiplier) + "x"
-        await self.dmap.edit(interaction.message)
+        await self.dmap.edit()
+
+
+class SettingsButton(discord.ui.Button):
+    def __init__(self, dmap: Map):
+        super().__init__(style=discord.ButtonStyle.blurple, label="Settings", row=DEFAULT_ROW + 1)
+        self.dmap = dmap
+
+    async def callback(self, interaction: discord.Interaction):
+        settings = Settings(self.dmap)
+        await settings.send(interaction.response)
 
 
 class UpButton(BaseMapControlButton):
