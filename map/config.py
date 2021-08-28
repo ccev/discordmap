@@ -18,3 +18,12 @@ class Area:
         self.lat = lat
         self.lon = lon
         self.zoom = zoom
+
+
+class Icons:
+    name: str
+    url: str
+
+    def __init__(self, name: str, url: str):
+        self.name = name
+        self.url = url + "{}.png"

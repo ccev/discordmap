@@ -5,6 +5,7 @@ from map.map import Map
 import config
 
 bot = commands.Bot(command_prefix="!", case_insensitive=1)
+config.ICONSET = config.ICONSETS[0]
 
 
 @bot.command()

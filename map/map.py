@@ -19,6 +19,7 @@ class Map(discord.ui.View):
     lat: float
     lon: float
     style: str = STYLES[0][1]
+    style_name: str = STYLES[0][0]
     multiplier: float
     marker_multiplier: float
     author_id: int
@@ -35,7 +36,7 @@ class Map(discord.ui.View):
 
     def __init__(self, author_id: int):
         super().__init__(timeout=None)
-        self.set_time()
+        self.start = time()
         init_area = AREAS[0]
         self.zoom = init_area.zoom
         self.lat = init_area.lat
@@ -76,8 +77,12 @@ class Map(discord.ui.View):
             })
         return data
 
-    def set_time(self):
+    async def start_load(self):
         self.start = time()
+        self.embed.set_footer(icon_url="https://cdn.discordapp.com/attachments/"
+                                       "523253670700122144/881302405826887760/785.gif",
+                              text="Loading...")
+        await self.edit()
 
     def is_author(self, check_id: int):
         return check_id == self.author_id

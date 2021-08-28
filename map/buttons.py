@@ -24,7 +24,7 @@ class BaseMapControlButton(discord.ui.Button):
         await interaction.response.defer()
         if not self.dmap.is_author(interaction.user.id):
             return
-        self.dmap.set_time()
+        await self.dmap.start_load()
         await self.dmap.update()
 
 

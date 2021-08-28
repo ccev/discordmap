@@ -1,5 +1,6 @@
-from map.config import Schema, Area
+from map.config import Schema, Area, Icons
 EMOJIS = {}
+ICONSET = None
 # ^^^^ IGNORE ^^^^
 
 DB_HOST = "0.0.0.0"
@@ -25,3 +26,14 @@ AREAS = [
 ]
 # The first listed area will be used on map start
 # Format: Name, lat, lon, zoom
+
+ICONSETS = [
+    Icons("Pogo (outline)", "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons-outline/"),
+    Icons("Pogo", "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons/"),
+    # Icons("HOME (outline)", "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS_OS_128/"),
+    # Icons("HOME", "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS/"),
+    # Icons("Shuffle", "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/")
+]
+# The first listed Iconset will be used on map start. Only UICONS are supported
+# Format: Name, URL
+# Note that currently only the 2 willem iconsets are supported, so the otheres are commented out

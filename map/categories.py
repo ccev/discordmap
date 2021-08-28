@@ -121,7 +121,7 @@ class CategorySelect(discord.ui.Select):
         await interaction.response.defer()
         if not self.dmap.is_author(interaction.user.id):
             return
-        self.dmap.set_time()
+        await self.dmap.start_load()
 
         values = list(map(int, self.values))
         for i, option in enumerate(self.options):
