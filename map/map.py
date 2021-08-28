@@ -1,12 +1,13 @@
 from __future__ import annotations
 from typing import Optional, List
 import aiohttp
+import asyncio
 import discord
 import math
 from time import time
 
 from map.buttons import (EmptyButton, MultiplierButton, UpButton, LeftButton, DownButton,
-                         RightButton, ZoomInButton, ZoomOutButton, SettingsButton)
+                         RightButton, ZoomInButton, ZoomOutButton, SettingsButton, FilterButton)
 from map.categories import CategorySelect
 from map.map_objects import MapObject
 from map.config import Area
@@ -20,8 +21,8 @@ class Map(discord.ui.View):
     lon: float
     style: str = STYLES[0][1]
     style_name: str = STYLES[0][0]
-    multiplier: float
-    marker_multiplier: float
+    multiplier: float = 1
+    marker_multiplier: float = 1
     author_id: int
     url: str = TILESERVER + "staticmap"
     message: discord.Message
@@ -43,8 +44,6 @@ class Map(discord.ui.View):
         self.lon = init_area.lon
         self.author_id = author_id
 
-        self.multiplier = 1
-        self.marker_multiplier = 1
         self.embed = discord.Embed()
         self.map_objects = []
         self.category = CategorySelect(self)
@@ -52,8 +51,9 @@ class Map(discord.ui.View):
         for item in [
             self.category,
             AreaSelect(self),
-            EmptyButton(0), UpButton(self), EmptyButton(1), ZoomInButton(self), MultiplierButton(self),
-            LeftButton(self), DownButton(self), RightButton(self), ZoomOutButton(self), SettingsButton(self)
+            EmptyButton(0), UpButton(self), EmptyButton(1), ZoomInButton(self),
+            LeftButton(self), DownButton(self), RightButton(self), ZoomOutButton(self),
+            SettingsButton(self), FilterButton(self), MultiplierButton(self)
         ]:
             self.add_item(item)
 
@@ -82,7 +82,7 @@ class Map(discord.ui.View):
         self.embed.set_footer(icon_url="https://cdn.discordapp.com/attachments/"
                                        "523253670700122144/881302405826887760/785.gif",
                               text="Loading...")
-        await self.edit()
+        asyncio.create_task(self.edit())
 
     def is_author(self, check_id: int):
         return check_id == self.author_id
@@ -121,7 +121,7 @@ class Map(discord.ui.View):
         result = size * (math.pow(2, self.zoom))
         end_size = int(result // 50000)
         min_size = int((self.width * size) // 500)
-        return max(end_size, min_size)
+        return int(round(max(end_size, min_size) * self.marker_multiplier))
 
     @staticmethod
     def _get_meters() -> float:

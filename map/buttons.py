@@ -17,7 +17,7 @@ def get_emoji(name):
 class BaseMapControlButton(discord.ui.Button):
     def __init__(self, dmap: Map, label: str, row: int = DEFAULT_ROW):
         emoji = get_emoji(label)
-        super().__init__(style=discord.ButtonStyle.grey, emoji=emoji, row=row)
+        super().__init__(style=discord.ButtonStyle.blurple, emoji=emoji, row=row)
         self.dmap = dmap
 
     async def _callback(self, interaction: discord.Interaction):
@@ -30,15 +30,15 @@ class BaseMapControlButton(discord.ui.Button):
 
 class EmptyButton(discord.ui.Button):
     def __init__(self, custom_id: int):
-        super().__init__(style=discord.ButtonStyle.grey, emoji=get_emoji("mapBl"), disabled=True,
+        super().__init__(style=discord.ButtonStyle.blurple, emoji=get_emoji("mapBl"), disabled=True,
                          custom_id=str(custom_id), row=DEFAULT_ROW)
 
 
 class MultiplierButton(discord.ui.Button):
     def __init__(self, dmap: Map):
         self.multipliers = [1, 0.5, 3, 2]
-        super().__init__(style=discord.ButtonStyle.green, label=str(self.multipliers[0]) + "x", custom_id="multiplier",
-                         row=DEFAULT_ROW)
+        super().__init__(style=discord.ButtonStyle.grey, label="Speed: " + str(self.multipliers[0]) + "x",
+                         custom_id="multiplier", row=DEFAULT_ROW + 2)
         self.dmap = dmap
 
     async def callback(self, interaction: discord.Interaction):
@@ -48,18 +48,27 @@ class MultiplierButton(discord.ui.Button):
         multiplier = self.multipliers.pop()
         self.multipliers.insert(0, multiplier)
         self.dmap.multiplier = multiplier
-        self.label = str(multiplier) + "x"
+        self.label = "Speed: " + str(multiplier) + "x"
         await self.dmap.edit()
 
 
 class SettingsButton(discord.ui.Button):
     def __init__(self, dmap: Map):
-        super().__init__(style=discord.ButtonStyle.blurple, label="Settings", row=DEFAULT_ROW + 1)
+        super().__init__(style=discord.ButtonStyle.grey, label="Settings", row=DEFAULT_ROW + 2)
         self.dmap = dmap
 
     async def callback(self, interaction: discord.Interaction):
         settings = Settings(self.dmap)
         await settings.send(interaction.response)
+
+
+class FilterButton(discord.ui.Button):
+    def __init__(self, dmap: Map):
+        super().__init__(style=discord.ButtonStyle.grey, label="Filters", row=DEFAULT_ROW + 2)
+        self.dmap = dmap
+
+    async def callback(self, interaction: discord.Interaction):
+        pass
 
 
 class UpButton(BaseMapControlButton):
