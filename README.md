@@ -9,11 +9,11 @@ An experimtenal Pokémon GO map using Discord components.
 - Pan & zoom
 - Jump to areas
 - variable multiplier to control how fast to pan/zoom
-- Settings to adjust map style, size and icon sets
+- Settings to adjust map style, size and icon sets/size
 
 ## Planned
+- cancel loading button
 - Quests
-- icon size in settings
 - Filters
 - better uicon support
 

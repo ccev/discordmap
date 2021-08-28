@@ -16,7 +16,6 @@ class StyleSelect(discord.ui.Select):
                          max_values=1,
                          row=0)
         for i, (style_name, style_value) in enumerate(config.STYLES):
-            style_name = "Map Style: " + style_name
             self.options.append(discord.SelectOption(label=style_name, value=style_value, default=i == 0))
         self.dmap = dmap
         self.settings = settings
@@ -27,7 +26,7 @@ class StyleSelect(discord.ui.Select):
         for option in self.options:
             if option.value == value:
                 option.default = True
-                self.dmap.style_name = option.label.replace("Map Style: ", "")
+                self.dmap.style_name = option.label
             else:
                 option.default = False
         self.dmap.style = value
@@ -60,11 +59,13 @@ class IconSelect(discord.ui.Select):
 class Settings(discord.ui.View):
     dmap: Map
     embed: discord.Embed
+    marker_sizes: list
 
     def __init__(self, dmap: Map):
         super().__init__(timeout=600)
         self.dmap = dmap
         self.make_embed()
+        self.marker_sizes = [("normal", 1), ("small", 0.5), ("big", 2)]
 
         for item in [StyleSelect(dmap, self), IconSelect(dmap, self)]:
             self.add_item(item)
@@ -80,7 +81,8 @@ class Settings(discord.ui.View):
         text = (
             f"Map Style: **{self.dmap.style_name}**\n"
             f"Icons: **{config.ICONSET.name}**\n"
-            f"Map size: **{self.dmap.width}x{self.dmap.height}px**"
+            f"Map size: **{self.dmap.width}x{self.dmap.height}px**\n"
+            f"Icon size: **{self.marker_sizes[0][0]}**"
         )
         self.embed = discord.Embed(title="Settings", description=text)
         self.embed.set_footer(text='When you\'re done here, click "Dismiss message" below')
@@ -113,3 +115,11 @@ class Settings(discord.ui.View):
     @discord.ui.button(label="- Height", row=2)
     async def dex_height(self, _, interaction: discord.Interaction):
         await self.__change_height(interaction, -30)
+
+    @discord.ui.button(label="Icon size: normal", row=3)
+    async def change_size(self, button: discord.ui.Button, interaction: discord.Interaction):
+        new_size = self.marker_sizes.pop()
+        self.marker_sizes.insert(0, new_size)
+        self.dmap.marker_multiplier = new_size[1]
+        button.label = "Icon size: " + new_size[0]
+        await self._update_map(interaction)
