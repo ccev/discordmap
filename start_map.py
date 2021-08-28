@@ -1,4 +1,5 @@
 from discord.ext import commands
+import  asyncio
 import discord
 
 from map.map import Map
@@ -10,6 +11,14 @@ config.ICONSET = config.ICONSETS[0]
 
 @bot.command()
 async def map(ctx: discord.ext.commands.Context):
+    wait_message = None
+    if not config.EMOJIS:
+        wait_message = await ctx.send("Still starting up. Give me a second")
+    while not config.EMOJIS:
+        await asyncio.sleep(1)
+    if wait_message:
+        await wait_message.delete()
+        
     dmap = Map(ctx.author.id)
     await dmap.send(ctx)
 

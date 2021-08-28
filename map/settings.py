@@ -40,7 +40,7 @@ class IconSelect(discord.ui.Select):
                          placeholder="Choose an iconset",
                          min_values=0,
                          max_values=1,
-                         row=1)
+                         row=2)
         for i, iconset in enumerate(config.ICONSETS):
             self.options.append(discord.SelectOption(label=iconset.name, value=str(i), default=i == 0))
         self.dmap = dmap
@@ -80,8 +80,8 @@ class Settings(discord.ui.View):
     def make_embed(self):
         text = (
             f"Map Style: **{self.dmap.style_name}**\n"
-            f"Icons: **{config.ICONSET.name}**\n"
             f"Map size: **{self.dmap.width}x{self.dmap.height}px**\n"
+            f"Icons: **{config.ICONSET.name}**\n"
             f"Icon size: **{self.marker_sizes[0][0]}**"
         )
         self.embed = discord.Embed(title="Settings", description=text)
@@ -100,19 +100,19 @@ class Settings(discord.ui.View):
         self.dmap.height += value
         await self._update_map(interaction)
 
-    @discord.ui.button(label="+ Width", row=2)
+    @discord.ui.button(label="+ Width", row=1)
     async def inc_width(self, _, interaction: discord.Interaction):
         await self.__change_width(interaction, 50)
 
-    @discord.ui.button(label="- Width", row=2)
+    @discord.ui.button(label="- Width", row=1)
     async def dec_width(self, _, interaction: discord.Interaction):
         await self.__change_width(interaction, -50)
 
-    @discord.ui.button(label="+ Height", row=2)
+    @discord.ui.button(label="+ Height", row=1)
     async def inc_height(self, _, interaction: discord.Interaction):
         await self.__change_height(interaction, 30)
 
-    @discord.ui.button(label="- Height", row=2)
+    @discord.ui.button(label="- Height", row=1)
     async def dex_height(self, _, interaction: discord.Interaction):
         await self.__change_height(interaction, -30)
 

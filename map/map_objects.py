@@ -16,6 +16,7 @@ class MapObject:
     width: Optional[int] = None
     y_offset: int = 0
     x_offset: int = 0
+    uicon_category: str
 
     def get_markers(self) -> List[Dict[str, Any]]:
         if not self.height:
@@ -34,6 +35,8 @@ class MapObject:
 
 
 class Pokemon(MapObject):
+    uicon_category = "pokemon"
+
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, mon_id, form, costume = data
         uicon = str(mon_id)
@@ -41,36 +44,42 @@ class Pokemon(MapObject):
             uicon += f"_f{form}"
         if costume:
             uicon += f"_c{costume}"
-        self.url = config.ICONSET.url.format(f"pokemon/{uicon}")
+        self.url = config.ICONSET.url.format(f"{self.uicon_category}/{uicon}")
         self.size = dmap.get_marker_size(15)
 
 
 class Gym(MapObject):
+    uicon_category = "gym"
+
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, team_id, level = data
         uicon = str(team_id)
         if team_id and level:
             uicon += f"_t{level}"
 
-        self.url = config.ICONSET.url.format(f"gym/{uicon}")
+        self.url = config.ICONSET.url.format(f"{self.uicon_category}/{uicon}")
         self.size = dmap.get_marker_size()
         self.y_offset = self.size // -2
 
 
 class Pokestop(MapObject):
+    uicon_category = "pokestop"
+
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon = data
-        self.url = config.ICONSET.url.format("pokestop/0")
+        self.url = config.ICONSET.url.format(f"{self.uicon_category}/0")
         self.size = dmap.get_marker_size(17)
         self.y_offset = self.size // -2
 
 
 class Grunt(MapObject):
+    uicon_category = "invasion"
+
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, grunt_id = data
         self.stop = Pokestop((self.lat, self.lon), dmap)
-        self.stop.url = config.ICONSET.url.format("pokestop/0_i")
-        self.url = config.ICONSET.url.format(f"invasion/{grunt_id}")
+        self.stop.url.replace(".png", "_i.png")
+        self.url = config.ICONSET.url.format(f"{self.uicon_category}/{grunt_id}")
 
         self.y_offset = - dmap.get_marker_size(10)
         self.x_offset = dmap.get_marker_size(5)
@@ -84,13 +93,17 @@ class Grunt(MapObject):
 
 
 class _RaidEgg(MapObject):
+    uicon_category = "raid/egg"
+
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, level = data
-        self.url = config.ICONSET.url.format(f"raid/egg/{level}")
+        self.url = config.ICONSET.url.format(f"{self.uicon_category}/{level}")
         self.size = dmap.get_marker_size()
 
 
 class Raid(MapObject):
+    uicon_category = ""
+
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, team, mon_id, form, costume, raid_level = data
         self.gym = Gym((self.lat, self.lon, team, 0), dmap)
