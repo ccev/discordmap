@@ -64,8 +64,8 @@ class Settings(discord.ui.View):
     def __init__(self, dmap: Map):
         super().__init__(timeout=600)
         self.dmap = dmap
-        self.make_embed()
         self.marker_sizes = [("normal", 1), ("small", 0.5), ("big", 2)]
+        self.make_embed()
 
         for item in [StyleSelect(dmap, self), IconSelect(dmap, self)]:
             self.add_item(item)
