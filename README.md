@@ -11,11 +11,9 @@ An experimtenal Pokémon GO map using Discord components.
 - variable multiplier to control how fast to pan/zoom
 
 ## Planned
-- Only one user at a time
 - Quests
-- Settings to change iconsets, map styles, etc
+- icon size in settings
 - Filters
-- RDM support
 
 # Setup
 - `cp config-example.py config.py` and fill out

@@ -1,4 +1,4 @@
-from map.config import Schema, Area, Icons
+from map.config import MAD, RDM, Area, Icons
 EMOJIS = {}
 ICONSET = None
 # ^^^^ IGNORE ^^^^
@@ -8,7 +8,7 @@ DB_PORT = 3306
 DB_USER = ""
 DB_PASSWORD = ""
 DB_NAME = "mad"
-DB_SCHEMA = Schema.MAD  # unused (only mad support)
+DB_SCHEMA = MAD  # unused (only mad support)
 
 MAP_WIDTH = 700
 MAP_HEIGHT = 400
