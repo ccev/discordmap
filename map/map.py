@@ -12,7 +12,7 @@ from map.categories import CategorySelect
 from map.map_objects import MapObject
 from map.config import Area
 from map.areaselect import AreaSelect
-from config import MAP_SCALE, MAP_HEIGHT, MAP_WIDTH, TILESERVER, AREAS, STYLES
+from config import MAP_SCALE, MAP_HEIGHT, MAP_WIDTH, TILESERVER, AREAS, STYLES, MARKER_LIMIT
 
 
 class Map(discord.ui.View):
@@ -34,6 +34,7 @@ class Map(discord.ui.View):
     scale: int = MAP_SCALE
     category: CategorySelect
     map_objects: List[MapObject]
+    hit_limit: bool = False
 
     def __init__(self, author_id: int):
         super().__init__(timeout=None)
@@ -68,9 +69,14 @@ class Map(discord.ui.View):
             "format": "png",
             "scale": self.scale
         }
+        if len(self.map_objects) >= MARKER_LIMIT:
+            self.hit_limit = True
         if self.map_objects:
             markers = []
             for map_object in self.map_objects:
+                if len(markers) >= MARKER_LIMIT:
+                    self.hit_limit = True
+                    break
                 markers += map_object.get_markers()
             data.update({
                 "markers": markers
@@ -145,11 +151,16 @@ class Map(discord.ui.View):
         self.zoom = area.zoom
 
     async def set_map(self):
+        self.hit_limit = False
         async with aiohttp.ClientSession() as session:
             async with session.post(self.url + "?pregenerate=true", json=self.get_data()) as resp:
                 pregen_id = await resp.text()
                 self.embed.set_image(url=self.url + "/pregenerated/" + pregen_id)
-                self.embed.set_footer(text=f"This took {round(time() - self.start, 3)}s")
+                footer = f"This took {round(time() - self.start, 3)}s"
+                if self.hit_limit:
+                    footer += f"\nWarning: You hit the marker limit of {MARKER_LIMIT}." \
+                              f" Try zooming in our decreasing categories/filters"
+                self.embed.set_footer(text=footer)
 
     async def edit(self):
         await self.message.edit(embed=self.embed, view=self)

@@ -4,7 +4,7 @@ import aiomysql
 from typing import TYPE_CHECKING, List, Type
 
 from map.map_objects import MapObject, Pokemon, Gym, Raid, Pokestop, Grunt
-from config import DB_HOST, DB_NAME, DB_PORT, DB_USER, DB_SCHEMA, DB_PASSWORD
+from config import DB_HOST, DB_NAME, DB_PORT, DB_USER, DB_SCHEMA, DB_PASSWORD, MARKER_LIMIT
 from map.buttons import get_emoji
 
 if TYPE_CHECKING:
@@ -33,6 +33,7 @@ class Category(discord.SelectOption):
         else:
             query += " where"
         query += DB_SCHEMA.bbox_filter.format(bbox[0], bbox[2], bbox[1], bbox[3])
+        query += " LIMIT " + str(MARKER_LIMIT)
         conn = await aiomysql.connect(
             host=DB_HOST,
             port=DB_PORT,

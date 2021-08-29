@@ -1,3 +1,7 @@
+from typing import Union
+import discord
+
+
 class RDM:
     bbox_filter = " lat > {} and lat < {} and lon > {} and lon < {}"
     pokemon = ("select lat, lon, pokemon_id, form, costume "
@@ -30,6 +34,24 @@ class MAD:
     grunts = ("select latitude, longitude, incident_grunt_type "
               "from pokestop "
               "where incident_expiration > utc_timestamp()")
+
+
+class Theme:
+    name: str = ""
+    style: int = 0
+    # embed_color: Union[discord.Color, discord.Embed.Empty]
+    empty_button_color: discord.ButtonStyle
+    up_button_color: discord.ButtonStyle
+    left_button_color: discord.ButtonStyle
+    down_button_color: discord.ButtonStyle
+    right_button_color: discord.ButtonStyle
+    zoom_in_button_color: discord.ButtonStyle
+    zoom_out_button_color: discord.ButtonStyle
+    settings_button_color: discord.ButtonStyle
+    filters_button_color: discord.ButtonStyle
+    speed_button_color: discord.ButtonStyle
+
+    # TODO
 
 
 class Area:

@@ -9,8 +9,8 @@ bot = commands.Bot(command_prefix="!", case_insensitive=1)
 config.ICONSET = config.ICONSETS[0]
 
 
-@bot.command()
-async def map(ctx: discord.ext.commands.Context):
+@bot.command(name="map")
+async def map_command(ctx: discord.ext.commands.Context):
     wait_message = None
     if not config.EMOJIS:
         wait_message = await ctx.send("Still starting up. Give me a second")
@@ -18,7 +18,7 @@ async def map(ctx: discord.ext.commands.Context):
         await asyncio.sleep(1)
     if wait_message:
         await wait_message.delete()
-        
+
     dmap = Map(ctx.author.id)
     await dmap.send(ctx)
 
