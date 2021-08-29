@@ -12,13 +12,11 @@ An experimtenal Pokémon GO map using Discord components.
 - Settings to adjust map style, size and icon sets/size
 
 ## Planned
-- cancel loading button
 - Quests
 - Filters
-- better uicon support
 
 # Setup
 - `cp config-example.py config.py` and fill out
-- create a venv (important!) and `path/to/venv/pip install git+https://github.com/Rapptz/discord.py.git aiomysql`
+- create a venv (important!) and `path/to/venv/pip install git+https://github.com/Rapptz/discord.py.git aiomysql requests`
 - Upload the emojis in the `emojis/` folder to your configured emoji server
 - start the bot using `start_map.py`. You can get the map by saying `!map` wherever

@@ -1,5 +1,7 @@
-from typing import Union
+from typing import Union, Dict, Any
 import discord
+import requests
+from map.map_objects import Pokemon, Gym, Pokestop, Grunt, RaidEgg
 
 
 class RDM:
@@ -70,7 +72,13 @@ class Area:
 class Icons:
     name: str
     url: str
+    index: Dict[str, Any]
 
     def __init__(self, name: str, url: str):
         self.name = name
-        self.url = url + "{}.png"
+        self.url = url
+
+        print("Preparing iconset", name)
+        result = requests.get(url + "index.json")
+        self.index = result.json()
+        self.index["raid/egg"] = self.index["raid"]["egg"]

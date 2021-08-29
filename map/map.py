@@ -159,6 +159,9 @@ class Map(discord.ui.View):
             async with session.post(self.url + "?pregenerate=true", json=self.get_data()) as resp:
                 pregen_id = await resp.text()
                 if "error" in pregen_id:
+                    print("Tileserver threw an error. Retrying", pregen_id)
+                    resp.close()
+                    await session.close()
                     await self.set_map(attempt + 1)
                 else:
                     self.embed.set_image(url=self.url + "/pregenerated/" + pregen_id)

@@ -64,7 +64,7 @@ class Settings(discord.ui.View):
     def __init__(self, dmap: Map):
         super().__init__(timeout=600)
         self.dmap = dmap
-        self.marker_sizes = [("normal", 1), ("small", 0.5), ("big", 2)]
+        self.marker_sizes = [("M", 1), ("S", 0.7), ("XL", 2), ("L", 1.5)]
         self.make_embed()
 
         for item in [StyleSelect(dmap, self), IconSelect(dmap, self)]:
@@ -116,7 +116,7 @@ class Settings(discord.ui.View):
     async def dex_height(self, _, interaction: discord.Interaction):
         await self.__change_height(interaction, -30)
 
-    @discord.ui.button(label="Icon size: normal", row=3)
+    @discord.ui.button(label="Icon size: M", row=3)
     async def change_size(self, button: discord.ui.Button, interaction: discord.Interaction):
         new_size = self.marker_sizes.pop()
         self.marker_sizes.insert(0, new_size)

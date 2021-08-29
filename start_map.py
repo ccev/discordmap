@@ -1,5 +1,5 @@
 from discord.ext import commands
-import  asyncio
+import asyncio
 import discord
 
 from map.map import Map

@@ -33,18 +33,34 @@ class MapObject:
             "y_offset": self.y_offset
         }]
 
+    def make_uicon(self, *args):
+        combinations = []
+        args = list(map(str, args))
+        for i in range(1, len(args) + 1):
+            combinations.insert(0, args[:i])
+        i = 0
+        for combination in combinations.copy():
+            if len(combination) > 2:
+                new_combination = combination.copy()
+                del new_combination[-2]
+                combinations.insert(i + 2, new_combination)
+                i += 2
+        combinations.append(["0"])
+
+        for combination in combinations:
+            name = "_".join(combination) + ".png"
+            if name in config.ICONSET.index.get(self.uicon_category, []):
+                self.url = config.ICONSET.url + f"{self.uicon_category}/{name}"
+                return
+        self.url = config.ICONSET.url + "pokemon/0.png"
+
 
 class Pokemon(MapObject):
     uicon_category = "pokemon"
 
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, mon_id, form, costume = data
-        uicon = str(mon_id)
-        if form:
-            uicon += f"_f{form}"
-        if costume:
-            uicon += f"_c{costume}"
-        self.url = config.ICONSET.url.format(f"{self.uicon_category}/{uicon}")
+        self.make_uicon(mon_id, f"f{form}", f"c{costume}")
         self.size = dmap.get_marker_size(15)
 
 
@@ -53,11 +69,8 @@ class Gym(MapObject):
 
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, team_id, level = data
-        uicon = str(team_id)
-        if team_id and level:
-            uicon += f"_t{level}"
+        self.make_uicon(team_id, f"t{level}")
 
-        self.url = config.ICONSET.url.format(f"{self.uicon_category}/{uicon}")
         self.size = dmap.get_marker_size()
         self.y_offset = self.size // -2
 
@@ -65,9 +78,9 @@ class Gym(MapObject):
 class Pokestop(MapObject):
     uicon_category = "pokestop"
 
-    def __init__(self, data: tuple, dmap: Map):
+    def __init__(self, data: tuple, dmap: Map, *uicon_args):
         self.lat, self.lon = data
-        self.url = config.ICONSET.url.format(f"{self.uicon_category}/0")
+        self.make_uicon(0, *uicon_args)
         self.size = dmap.get_marker_size(17)
         self.y_offset = self.size // -2
 
@@ -77,12 +90,11 @@ class Grunt(MapObject):
 
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, grunt_id = data
-        self.stop = Pokestop((self.lat, self.lon), dmap)
-        self.stop.url.replace(".png", "_i.png")
-        self.url = config.ICONSET.url.format(f"{self.uicon_category}/{grunt_id}")
+        self.stop = Pokestop((self.lat, self.lon), dmap, "i")
+        self.make_uicon(grunt_id)
 
         self.y_offset = - dmap.get_marker_size(10)
-        self.x_offset = dmap.get_marker_size(5)
+        self.x_offset = dmap.get_marker_size(-5)
         self.size = dmap.get_marker_size(13)
 
     def get_markers(self) -> List[Dict[str, Any]]:
@@ -92,18 +104,16 @@ class Grunt(MapObject):
         return markers
 
 
-class _RaidEgg(MapObject):
+class RaidEgg(MapObject):
     uicon_category = "raid/egg"
 
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, level = data
-        self.url = config.ICONSET.url.format(f"{self.uicon_category}/{level}")
+        self.make_uicon(level)
         self.size = dmap.get_marker_size()
 
 
 class Raid(MapObject):
-    uicon_category = ""
-
     def __init__(self, data: tuple, dmap: Map):
         self.lat, self.lon, team, mon_id, form, costume, raid_level = data
         self.gym = Gym((self.lat, self.lon, team, 0), dmap)
@@ -111,7 +121,7 @@ class Raid(MapObject):
         if mon_id:
             self.boss = Pokemon((self.lat, self.lon, mon_id, form, costume), dmap)
         else:
-            self.boss = _RaidEgg((self.lat, self.lon, raid_level), dmap)
+            self.boss = RaidEgg((self.lat, self.lon, raid_level), dmap)
         self.boss.y_offset = - dmap.get_marker_size(12)
         self.boss.x_offset = - dmap.get_marker_size(3)
         self.boss.size = dmap.get_marker_size(15)
