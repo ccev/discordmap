@@ -150,17 +150,23 @@ class Map(discord.ui.View):
         self.lon = area.lon
         self.zoom = area.zoom
 
-    async def set_map(self):
+    async def set_map(self, attempt: int = 0):
+        if attempt >= 3:
+            self.embed.set_footer(text="Sorry, there was an error loading the map")
+            return
         self.hit_limit = False
         async with aiohttp.ClientSession() as session:
             async with session.post(self.url + "?pregenerate=true", json=self.get_data()) as resp:
                 pregen_id = await resp.text()
-                self.embed.set_image(url=self.url + "/pregenerated/" + pregen_id)
-                footer = f"This took {round(time() - self.start, 3)}s"
-                if self.hit_limit:
-                    footer += f"\nWarning: You hit the marker limit of {MARKER_LIMIT}." \
-                              f" Try zooming in our decreasing categories/filters"
-                self.embed.set_footer(text=footer)
+                if "error" in pregen_id:
+                    await self.set_map(attempt + 1)
+                else:
+                    self.embed.set_image(url=self.url + "/pregenerated/" + pregen_id)
+                    footer = f"This took {round(time() - self.start, 3)}s"
+                    if self.hit_limit:
+                        footer += f"\nWarning: You hit the marker limit of {MARKER_LIMIT}." \
+                                  f" Try zooming in our decreasing categories/filters"
+                    self.embed.set_footer(text=footer)
 
     async def edit(self):
         await self.message.edit(embed=self.embed, view=self)
