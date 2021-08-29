@@ -3,7 +3,7 @@ import discord
 import aiomysql
 from typing import TYPE_CHECKING, List, Type
 
-from map.map_objects import MapObject, Pokemon, Gym, Raid, Pokestop, Grunt
+from map.map_objects import MapObject, Pokemon, Gym, Raid, Pokestop, Grunt, Quest
 from config import DB_HOST, DB_NAME, DB_PORT, DB_USER, DB_SCHEMA, DB_PASSWORD, MARKER_LIMIT
 from map.buttons import get_emoji
 
@@ -87,7 +87,7 @@ class QuestCategory(Category):
     name = "Quests"
     emoji = "mapQu"
     query = DB_SCHEMA.quests
-    map_object = Pokestop
+    map_object = Quest
 
 
 class GruntCategory(Category):

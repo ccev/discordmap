@@ -15,7 +15,9 @@ class RDM:
     stops = "select lat, lon from pokestop"
     gyms = ("select lat, lon, team_id, (6 - available_slots)" 
             "from gym")
-    quests = "select lat, lon from pokestop"
+    quests = ("select lat, lon, quest_rewardr "
+              "from pokestop "
+              "where quest_timestamp > unix_timestamp(curdate())")
     grunts = ("select lat, lon, grunt_type "
               "from pokestop "
               "where incident_expire_timestamp > curtime()")
@@ -32,7 +34,9 @@ class MAD:
     stops = "select latitude, longitude from pokestop"
     gyms = ("select latitude, longitude, team_id, (6 - slots_available)" 
             "from gym")
-    quests = "select latitude, longitude from pokestop"
+    quests = ("select latitude, longitude, quest_reward "
+              "from trs_quest left join pokestop on trs_quest.GUID = pokestop.pokestop_id "
+              "where quest_timestamp > unix_timestamp(curdate())")
     grunts = ("select latitude, longitude, incident_grunt_type "
               "from pokestop "
               "where incident_expiration > utc_timestamp()")
@@ -81,4 +85,10 @@ class Icons:
         print("Preparing iconset", name)
         result = requests.get(url + "index.json")
         self.index = result.json()
-        self.index["raid/egg"] = self.index["raid"]["egg"]
+
+        for key, value in self.index.copy().items():
+            if not isinstance(value, dict):
+                continue
+            for sub_key, sub_value in value.items():
+                self.index[f"{key}/{sub_key}"] = sub_value
+            self.index.pop(key)

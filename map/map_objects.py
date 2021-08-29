@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import List, Dict, Any, Optional, TYPE_CHECKING
+from typing import List, Dict, Any, Optional, TYPE_CHECKING, Tuple
+import json
 import config
 
 if TYPE_CHECKING:
@@ -130,4 +131,83 @@ class Raid(MapObject):
         markers = []
         markers += self.gym.get_markers()
         markers += self.boss.get_markers()
+        return markers
+
+
+class RewardCandy(MapObject):
+    uicon_category = "reward/candy"
+    reward_id = 4
+
+    def __init__(self, coords: Tuple[float, float], reward: dict):
+        self.lat, self.lon = coords
+        mon_id = reward.get("candy", {}).get("pokemon_id", 0)
+        self.make_uicon(mon_id)
+
+
+class RewardItem(MapObject):
+    uicon_category = "reward/item"
+    reward_id = 2
+
+    def __init__(self, coords: Tuple[float, float], reward: dict):
+        self.lat, self.lon = coords
+        item = reward.get("item", {})
+        item_id = item.get("item", 0)
+        amount = item.get("amount", 0)
+        self.make_uicon(item_id, f"a{amount}")
+
+
+class RewardMegaEnergy(MapObject):
+    uicon_category = "reward/mega_resource"
+    reward_id = 12
+
+    def __init__(self, coords: Tuple[float, float], reward: dict):
+        self.lat, self.lon = coords
+        mon_id = reward.get("mega_resource", {}).get("pokemon_id", 0)
+        self.make_uicon(mon_id)
+
+
+class RewardStardust(MapObject):
+    uicon_category = "reward/stardust"
+    reward_id = 3
+
+    def __init__(self, coords: Tuple[float, float], reward: dict):
+        self.lat, self.lon = coords
+        amount = reward.get("stardust", 0)
+        self.make_uicon(amount)
+
+
+class Quest(MapObject):
+    def __init__(self, data: tuple, dmap: Map):
+        self.lat, self.lon, reward = data
+        self.stop = Pokestop((self.lat, self.lon), dmap, "q")
+
+        reward = json.loads(reward)[0]
+        rtype = reward["type"]
+        self.reward = RewardStardust((self.lat, self.lon), {})
+        if rtype == 7:
+            encounter = reward["pokemon_encounter"]
+            if encounter.get("is_hidden_ditto", False):
+                monid = 132
+                form = 0
+                costume = 0
+            else:
+                monid = encounter["pokemon_id"]
+                display = encounter.get("pokemon_display", {})
+                form = display.get("form_value", 0)
+                costume = display.get("costume_value", 0)
+            self.reward = Pokemon((self.lat, self.lon, monid, form, costume), dmap)
+        else:
+            for reward_class in [RewardItem, RewardCandy, RewardStardust, RewardMegaEnergy]:
+                if rtype == reward_class.reward_id:
+                    self.reward = reward_class((self.lat, self.lon), reward)
+                    break
+
+        self.reward.y_offset = - dmap.get_marker_size(10)
+        self.reward.x_offset = dmap.get_marker_size(5)
+        self.reward.size = dmap.get_marker_size(13)
+
+    def get_markers(self) -> List[Dict[str, Any]]:
+        markers = []
+        markers += self.stop.get_markers()
+        markers += self.reward.get_markers()
         return markers
