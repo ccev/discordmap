@@ -85,6 +85,8 @@ class Map(discord.ui.View):
 
     async def start_load(self):
         self.start = time()
+
+        return  # sometimes the below code throws a weird error. no idea how to fix it, so i'm just removing it for now
         self.embed.set_footer(icon_url="https://cdn.discordapp.com/attachments/"
                                        "523253670700122144/881302405826887760/785.gif",
                               text="Loading...")
@@ -167,8 +169,8 @@ class Map(discord.ui.View):
                     self.embed.set_image(url=self.url + "/pregenerated/" + pregen_id)
                     footer = f"This took {round(time() - self.start, 3)}s"
                     if self.hit_limit:
-                        footer += f"\nWarning: You hit the marker limit of {MARKER_LIMIT}." \
-                                  f" Try zooming in our decreasing categories/filters"
+                        footer += f"\nYou hit the marker limit of {MARKER_LIMIT}." \
+                                  f" Try zooming in or decrease categories and filters"
                     self.embed.set_footer(text=footer)
 
     async def edit(self):
@@ -180,12 +182,13 @@ class Map(discord.ui.View):
 
     async def update(self):
         self.map_objects = []
-        for selected_index in self.category.values:
+        values = list(map(int, self.category.values))
+        ids = []
+        for selected_index in sorted(values, reverse=True):
             category = self.category.categories[int(selected_index)]
 
             bbox = self.get_bbox()
-            new_objects = await category.get_map_objects(bbox)
-            # TODO no duplicate IDs
+            new_objects, ids = await category.get_map_objects(bbox, ids)
             self.map_objects += new_objects
 
         self.map_objects = sorted(self.map_objects, key=lambda o: o.lat, reverse=True)

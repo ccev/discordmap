@@ -18,6 +18,12 @@ class MapObject:
     y_offset: int = 0
     x_offset: int = 0
     uicon_category: str
+    disabled: bool = False
+    
+    def set_data(self, data: dict):
+        self.lat = data["lat"]
+        self.lon = data["lon"]
+        self.id = data["id"]
 
     def get_markers(self) -> List[Dict[str, Any]]:
         if not self.height:
@@ -59,8 +65,9 @@ class MapObject:
 class Pokemon(MapObject):
     uicon_category = "pokemon"
 
-    def __init__(self, data: tuple, dmap: Map):
-        self.lat, self.lon, mon_id, form, costume = data
+    def __init__(self, data: dict, dmap: Map):
+        self.set_data(data)
+        mon_id, form, costume = data["pokemon_id"], data["form"], data["costume"]
         self.make_uicon(mon_id, f"f{form}", f"c{costume}")
         self.size = dmap.get_marker_size(15)
 
@@ -68,8 +75,9 @@ class Pokemon(MapObject):
 class Gym(MapObject):
     uicon_category = "gym"
 
-    def __init__(self, data: tuple, dmap: Map):
-        self.lat, self.lon, team_id, level = data
+    def __init__(self, data: dict, dmap: Map):
+        self.set_data(data)
+        team_id, level = data["team_id"], data["level"]
         self.make_uicon(team_id, f"t{level}")
 
         self.size = dmap.get_marker_size()
@@ -79,20 +87,25 @@ class Gym(MapObject):
 class Pokestop(MapObject):
     uicon_category = "pokestop"
 
-    def __init__(self, data: tuple, dmap: Map, *uicon_args):
-        self.lat, self.lon = data
+    def __init__(self, data: dict, dmap: Map, *uicon_args):
+        self.set_data(data)
         self.make_uicon(0, *uicon_args)
         self.size = dmap.get_marker_size(17)
         self.y_offset = self.size // -2
+
+    def get_markers(self) -> List[Dict[str, Any]]:
+        if not self.disabled:
+            return super().get_markers()
+        return []
 
 
 class Grunt(MapObject):
     uicon_category = "invasion"
 
-    def __init__(self, data: tuple, dmap: Map):
-        self.lat, self.lon, grunt_id = data
-        self.stop = Pokestop((self.lat, self.lon), dmap, "i")
-        self.make_uicon(grunt_id)
+    def __init__(self, data: dict, dmap: Map):
+        self.set_data(data)
+        self.stop = Pokestop(data, dmap, "i")
+        self.make_uicon(data["grunt_type"])
 
         self.y_offset = - dmap.get_marker_size(10)
         self.x_offset = dmap.get_marker_size(-5)
@@ -108,28 +121,28 @@ class Grunt(MapObject):
 class RaidEgg(MapObject):
     uicon_category = "raid/egg"
 
-    def __init__(self, data: tuple, dmap: Map):
-        self.lat, self.lon, level = data
-        self.make_uicon(level)
+    def __init__(self, data: dict, dmap: Map):
+        self.set_data(data)
+        self.make_uicon(data["level"])
         self.size = dmap.get_marker_size()
 
 
 class Raid(MapObject):
-    def __init__(self, data: tuple, dmap: Map):
-        self.lat, self.lon, team, mon_id, form, costume, raid_level = data
-        self.gym = Gym((self.lat, self.lon, team, 0), dmap)
+    def __init__(self, data: dict, dmap: Map):
+        self.gym = Gym(data, dmap)
 
-        if mon_id:
-            self.boss = Pokemon((self.lat, self.lon, mon_id, form, costume), dmap)
+        if data["pokemon_id"]:
+            self.boss = Pokemon(data, dmap)
         else:
-            self.boss = RaidEgg((self.lat, self.lon, raid_level), dmap)
+            self.boss = RaidEgg(data, dmap)
         self.boss.y_offset = - dmap.get_marker_size(12)
-        self.boss.x_offset = - dmap.get_marker_size(3)
+        self.boss.x_offset = - dmap.get_marker_size(2)
         self.boss.size = dmap.get_marker_size(15)
 
     def get_markers(self) -> List[Dict[str, Any]]:
         markers = []
-        markers += self.gym.get_markers()
+        if not self.disabled:
+            markers += self.gym.get_markers()
         markers += self.boss.get_markers()
         return markers
 
@@ -177,11 +190,11 @@ class RewardStardust(MapObject):
 
 
 class Quest(MapObject):
-    def __init__(self, data: tuple, dmap: Map):
-        self.lat, self.lon, reward = data
-        self.stop = Pokestop((self.lat, self.lon), dmap, "q")
+    def __init__(self, data: dict, dmap: Map):
+        self.set_data(data)
+        self.stop = Pokestop(data, dmap, "q")
 
-        reward = json.loads(reward)[0]
+        reward = json.loads(data["quest_reward"])[0]
         rtype = reward["type"]
         self.reward = RewardStardust((self.lat, self.lon), {})
         if rtype == 7:
@@ -195,7 +208,10 @@ class Quest(MapObject):
                 display = encounter.get("pokemon_display", {})
                 form = display.get("form_value", 0)
                 costume = display.get("costume_value", 0)
-            self.reward = Pokemon((self.lat, self.lon, monid, form, costume), dmap)
+            data["pokemon_id"] = monid
+            data["form"] = form
+            data["costume"] = costume
+            self.reward = Pokemon(data, dmap)
         else:
             for reward_class in [RewardItem, RewardCandy, RewardStardust, RewardMegaEnergy]:
                 if rtype == reward_class.reward_id:
@@ -208,6 +224,7 @@ class Quest(MapObject):
 
     def get_markers(self) -> List[Dict[str, Any]]:
         markers = []
-        markers += self.stop.get_markers()
+        if not self.disabled:
+            markers += self.stop.get_markers()
         markers += self.reward.get_markers()
         return markers

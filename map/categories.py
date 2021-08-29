@@ -1,7 +1,7 @@
 from __future__ import annotations
 import discord
 import aiomysql
-from typing import TYPE_CHECKING, List, Type
+from typing import TYPE_CHECKING, List, Tuple
 
 from map.map_objects import MapObject, Pokemon, Gym, Raid, Pokestop, Grunt, Quest
 from config import DB_HOST, DB_NAME, DB_PORT, DB_USER, DB_SCHEMA, DB_PASSWORD, MARKER_LIMIT
@@ -39,20 +39,25 @@ class Category(discord.SelectOption):
             port=DB_PORT,
             user=DB_USER,
             password=DB_PASSWORD,
-            db=DB_NAME)
+            db=DB_NAME,
+            cursorclass=aiomysql.cursors.DictCursor)
         async with conn.cursor() as cursor:
             await cursor.execute(query)
             r = await cursor.fetchall()
         conn.close()
         return r
 
-    async def get_map_objects(self, bbox) -> List[MapObject]:
+    async def get_map_objects(self, bbox, ids: list) -> Tuple[List[MapObject], List[str]]:
         objects = []
         result = await self.fetch(self.query, bbox)
         for data in result:
             map_object = self.map_object(data, self.dmap)
             objects.append(map_object)
-        return objects
+            if map_object.id in ids:
+                map_object.disabled = True
+            else:
+                ids.append(map_object.id)
+        return objects, ids
 
 
 class PokemonCategory(Category):

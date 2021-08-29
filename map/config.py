@@ -6,38 +6,40 @@ from map.map_objects import Pokemon, Gym, Pokestop, Grunt, RaidEgg
 
 class RDM:
     bbox_filter = " lat > {} and lat < {} and lon > {} and lon < {}"
-    pokemon = ("select lat, lon, pokemon_id, form, costume "
+    pokemon = ("select id, lat, lon, pokemon_id, form, costume "
                "from pokemon "
                "where expire_timestamp > curtime()")
-    raids = ("select lat, lon, team_id, raid_pokemon_id, raid_pokemon_form, raid_pokemon_costume, raid_level "
+    raids = ("select id, lat, lon, team_id, raid_pokemon_id as pokemon_id, raid_pokemon_form as form, "
+             "raid_pokemon_costume as costume, raid_level as level "
              "from raid "
              "where raid_end_timestamp > curtime()")
-    stops = "select lat, lon from pokestop"
-    gyms = ("select lat, lon, team_id, (6 - available_slots)" 
+    stops = "select id, lat, lon from pokestop"
+    gyms = ("select id, lat, lon, team_id, (6 - available_slots) as level" 
             "from gym")
-    quests = ("select lat, lon, quest_rewardr "
+    quests = ("select id, lat, lon, quest_rewards as quest_reward "
               "from pokestop "
               "where quest_timestamp > unix_timestamp(curdate())")
-    grunts = ("select lat, lon, grunt_type "
+    grunts = ("select id, lat, lon, grunt_type "
               "from pokestop "
               "where incident_expire_timestamp > curtime()")
 
 
 class MAD:
     bbox_filter = " latitude > {} and latitude < {} and longitude > {} and longitude < {}"
-    pokemon = ("select latitude, longitude, pokemon_id, form, costume "
+    pokemon = ("select encounter_id as id, latitude as lat, longitude as lon, pokemon_id, form, costume "
                "from pokemon "
                "where disappear_time > utc_timestamp()")
-    raids = ("select latitude, longitude, team_id, pokemon_id, raid.form, raid.costume, raid.level "
+    raids = ("select gym.gym_id as id, latitude as lat, longitude as lon, team_id, pokemon_id, raid.form as form, "
+             "raid.costume as costume, raid.level as level "
              "from raid left join gym on raid.gym_id = gym.gym_id "
              "where end > utc_timestamp()")
-    stops = "select latitude, longitude from pokestop"
-    gyms = ("select latitude, longitude, team_id, (6 - slots_available)" 
+    stops = "select pokestop_id as id, latitude as lat, longitude as lon from pokestop"
+    gyms = ("select latitude as lat, longitude as lon, team_id, (6 - slots_available) as level " 
             "from gym")
-    quests = ("select latitude, longitude, quest_reward "
+    quests = ("select pokestop_id as id, latitude as lat, longitude as lon, quest_reward "
               "from trs_quest left join pokestop on trs_quest.GUID = pokestop.pokestop_id "
               "where quest_timestamp > unix_timestamp(curdate())")
-    grunts = ("select latitude, longitude, incident_grunt_type "
+    grunts = ("select pokestop_id as id, latitude as lat, longitude as lon, incident_grunt_type as grunt_type "
               "from pokestop "
               "where incident_expiration > utc_timestamp()")
 

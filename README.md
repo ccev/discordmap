@@ -13,7 +13,6 @@ An experimtenal Pokémon GO map using Discord components.
 
 ## Planned
 - Filters
-- Better handling of stop/gym overlaying
 - Themes
 - save user settings across sessions
 - Option to display current objects in a list. with details
