@@ -8,7 +8,7 @@ DB_PORT = 3306
 DB_USER = ""
 DB_PASSWORD = ""
 DB_NAME = "mad"
-DB_SCHEMA = MAD  # unused (only mad support)
+DB_SCHEMA = MAD
 
 MAP_WIDTH = 700
 MAP_HEIGHT = 400
@@ -31,9 +31,9 @@ AREAS = [
 ICONSETS = [
     Icons("Pogo (outline)", "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons-outline/"),
     Icons("Pogo", "https://raw.githubusercontent.com/whitewillem/PogoAssets/main/uicons/"),
-    # Icons("HOME (outline)", "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS_OS_128/"),
-    # Icons("HOME", "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS/"),
-    # Icons("Shuffle", "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/")
+    Icons("HOME (outline)", "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS_OS_128/"),
+    Icons("HOME", "https://raw.githubusercontent.com/nileplumb/PkmnHomeIcons/master/UICONS/"),
+    Icons("Shuffle", "https://raw.githubusercontent.com/nileplumb/PkmnShuffleMap/master/UICONS/")
 ]
 # The first listed Iconset will be used on map start. Only UICONS are supported
 # Format: Name, URL

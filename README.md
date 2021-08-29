@@ -13,6 +13,8 @@ An experimtenal Pokémon GO map using Discord components.
 
 ## Planned
 - Filters
+- Better handling of stop/gym overlaying
+- Themes
 
 # Setup
 - `cp config-example.py config.py` and fill out
