@@ -5,14 +5,13 @@ An experimtenal Pokémon GO map using Discord components.
 ![demo](https://cdn.discordapp.com/attachments/523253670700122144/880930702051405905/vHkLFO0kUy.gif)
 
 ## Features
-- Display Pokemon, Raids, Gyms, Pokestops and Grunts
+- Display Pokemon, Raids, Gyms, Pokestops, Quests and Grunts
 - Pan & zoom
 - Jump to areas
 - variable multiplier to control how fast to pan/zoom
 - Settings to adjust map style, size and icon sets/size
 
 ## Planned
-- Quests
 - Filters
 
 # Setup
