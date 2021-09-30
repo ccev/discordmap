@@ -21,7 +21,7 @@ class StyleSelect(discord.ui.Select):
         self.settings = settings
 
     async def callback(self, interaction: discord.Interaction):
-        await self.dmap.start_load()
+        self.dmap.start_load()
         value = self.values[0]
         for option in self.options:
             if option.value == value:
@@ -47,7 +47,7 @@ class IconSelect(discord.ui.Select):
         self.settings = settings
 
     async def callback(self, interaction: discord.Interaction):
-        await self.dmap.start_load()
+        self.dmap.start_load()
         value = int(self.values[0])
         config.ICONSET = config.ICONSETS[value]
         for option in self.options:
@@ -89,7 +89,7 @@ class Settings(discord.ui.View):
 
     async def _update_map(self, interaction):
         await self.edit(interaction.response)
-        await self.dmap.start_load()
+        self.dmap.start_load()
         await self.dmap.update()
 
     async def __change_width(self, interaction, value):

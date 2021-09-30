@@ -129,6 +129,7 @@ class RaidEgg(MapObject):
 
 class Raid(MapObject):
     def __init__(self, data: dict, dmap: Map):
+        self.set_data(data)
         self.gym = Gym(data, dmap)
 
         if data["pokemon_id"]:

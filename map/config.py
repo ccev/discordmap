@@ -34,7 +34,7 @@ class MAD:
              "from raid left join gym on raid.gym_id = gym.gym_id "
              "where end > utc_timestamp()")
     stops = "select pokestop_id as id, latitude as lat, longitude as lon from pokestop"
-    gyms = ("select latitude as lat, longitude as lon, team_id, (6 - slots_available) as level " 
+    gyms = ("select gym_id as id, latitude as lat, longitude as lon, team_id, (6 - slots_available) as level " 
             "from gym")
     quests = ("select pokestop_id as id, latitude as lat, longitude as lon, quest_reward "
               "from trs_quest left join pokestop on trs_quest.GUID = pokestop.pokestop_id "

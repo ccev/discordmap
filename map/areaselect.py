@@ -22,7 +22,7 @@ class AreaSelect(discord.ui.Select):
         await interaction.response.defer()
         if not self.dmap.is_author(interaction.user.id):
             return
-        await self.dmap.start_load()
+        self.dmap.start_load()
         value = int(self.values[0])
         self.dmap.jump_to_area(AREAS[value])
         await self.dmap.update()

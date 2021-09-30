@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Optional, List
 import aiohttp
-import asyncio
 import discord
 import math
 from time import time
@@ -36,7 +35,7 @@ class Map(discord.ui.View):
     map_objects: List[MapObject]
     hit_limit: bool = False
 
-    def __init__(self, author_id: int):
+    def __init__(self, author_id: int, loop):
         super().__init__(timeout=None)
         self.start = time()
         init_area = AREAS[0]
@@ -48,6 +47,8 @@ class Map(discord.ui.View):
         self.embed = discord.Embed()
         self.map_objects = []
         self.category = CategorySelect(self)
+
+        self.loop = loop
 
         for item in [
             self.category,
@@ -83,14 +84,13 @@ class Map(discord.ui.View):
             })
         return data
 
-    async def start_load(self):
+    def start_load(self):
         self.start = time()
 
-        return  # sometimes the below code throws a weird error. no idea how to fix it, so i'm just removing it for now
         self.embed.set_footer(icon_url="https://cdn.discordapp.com/attachments/"
                                        "523253670700122144/881302405826887760/785.gif",
                               text="Loading...")
-        asyncio.create_task(self.edit())
+        self.loop.create_task(self.edit())
 
     def is_author(self, check_id: int):
         return check_id == self.author_id

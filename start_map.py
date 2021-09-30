@@ -5,12 +5,13 @@ import discord
 from map.map import Map
 import config
 
-bot = commands.Bot(command_prefix="!", case_insensitive=1)
+bot = commands.Bot("!", slash_command_guilds=[523253670700122140], slash_commands=True, intents=discord.Intents.none())
 config.ICONSET = config.ICONSETS[0]
 
 
-@bot.command(name="map")
-async def map_command(ctx: discord.ext.commands.Context):
+@bot.command(name="map", message_command=False)
+async def map_command(ctx: commands.Context):
+    """Show an interactive map"""
     wait_message = None
     if not config.EMOJIS:
         wait_message = await ctx.send("Still starting up. Give me a second")
@@ -19,7 +20,7 @@ async def map_command(ctx: discord.ext.commands.Context):
     if wait_message:
         await wait_message.delete()
 
-    dmap = Map(ctx.author.id)
+    dmap = Map(ctx.author.id, ctx.bot.loop)
     await dmap.send(ctx)
 
 
