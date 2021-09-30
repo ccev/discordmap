@@ -5,7 +5,7 @@ import discord
 from map.map import Map
 import config
 
-bot = commands.Bot("!", slash_command_guilds=[523253670700122140], slash_commands=True, intents=discord.Intents.none())
+bot = commands.Bot("!", slash_command_guilds=config.GUILDS, slash_commands=True, intents=discord.Intents.none())
 config.ICONSET = config.ICONSETS[0]
 
 

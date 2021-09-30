@@ -17,6 +17,7 @@ TILESERVER = "https://tiles.url.com/"
 STYLES = [("OSM Bright", "osm-bright")]  # name, tileserver ID
 MARKER_LIMIT = 100
 
+GUILDS = [12836728173937233]  # Guild IDs that should have access to the map command
 ADMINS = [211562278800195584]  # unused rn
 EMOJI_SERVER = 12345678912345678
 TOKEN = ""
